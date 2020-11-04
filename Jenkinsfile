@@ -18,9 +18,9 @@ pipeline {
                     app.inside {
                         sh 'echo $(curl localhost:8080)'
                     }
-                 }
-              }
-           }
+                }
+            }
+        }
         stage('Push Docker Image') {
             when {
                 branch 'master'
@@ -30,7 +30,11 @@ pipeline {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
-                        stage('DeployToProduction') {
+                    }
+                }
+            }
+        }
+        stage('DeployToProduction') {
             when {
                 branch 'master'
             }
@@ -46,11 +50,10 @@ pipeline {
                         } catch (err) {
                             echo: 'caught error: $err'
                         }
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8080 -d klaimjmprtest/train-schedule:${env.BUILD_NUMBER}\""
+                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8080 -d kl;aimjmprtest/train-schedule:${env.BUILD_NUMBER}\""
                     }
                 }
             }
         }
     }
 }
-            }
